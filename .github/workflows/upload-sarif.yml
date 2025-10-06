@@ -11,7 +11,8 @@ permissions:
 jobs:
   sarif-upload:
     runs-on: macos-latest   # MacOS runner for ARM64
-
+    env:
+      ENDOR_TOKEN: ${{ vars.TOKEN_VAK }}
     steps:
       # Step 1: Checkout repository
       - name: Checkout repository
