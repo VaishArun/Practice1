@@ -1,0 +1,16 @@
+name: Upload SARIF to GitHub Code Scanning
+
+on:
+  workflow_dispatch:  # allows manual trigger from the Actions tab
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Upload SARIF results to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: findings.sarif
