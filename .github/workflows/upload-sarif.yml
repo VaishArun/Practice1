@@ -1,28 +1,44 @@
-name: Upload SARIF to GitHub Code Scanning
+name: Endor SARIF Scan and Upload
 
 on:
-  workflow_dispatch:  # manual trigger
-  push:               # optional
+  workflow_dispatch: # Manual trigger
+  push:              # Automatically run on push to any branch
 
 permissions:
   contents: read
-  security-events: write   # this is the correct permission for code scanning
+  security-events: write   # Required to upload SARIF to GitHub
 
 jobs:
-  upload:
-    runs-on: ubuntu-latest
+  sarif-upload:
+    runs-on: macos-latest   # MacOS runner for ARM64
+
     steps:
-      # Step 1: Checkout repository
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           persist-credentials: true
 
-      # Step 2: Run Endor scan to generate SARIF
-      - name: Run Endor scan to generate SARIF
-        run: endorctl scan --sarif-file findings.sarif
+      # Step 2: Install Endor Labs CLI for MacOS ARM64
+      - name: Install Endor Labs CLI
+        run: |
+          # Download latest CLI
+          curl -L https://api.endorlabs.com/download/latest/endorctl_macos_arm64 -o endorctl
 
-      # Step 3: Upload SARIF results to GitHub
+          # Verify checksum
+          echo "$(curl -s https://api.endorlabs.com/sha/latest/endorctl_macos_arm64)  endorctl" | shasum -a 256 -c
+
+          # Make it executable
+          chmod +x ./endorctl
+
+          # Make endorctl available in PATH
+          export PATH="$PWD:$PATH"
+
+      # Step 3: Run Endor scan and generate SARIF
+      - name: Run Endor scan
+        run: ./endorctl scan --sarif-file findings.sarif
+
+      # Step 4: Upload SARIF results to GitHub
       - name: Upload SARIF results to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
