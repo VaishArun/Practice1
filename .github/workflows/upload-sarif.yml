@@ -1,15 +1,28 @@
 name: Upload SARIF to GitHub Code Scanning
 
 on:
-  workflow_dispatch:  # allows manual trigger from the Actions tab
+  workflow_dispatch:  # allows manual trigger
+  push:               # optional – runs on push
+
+permissions:
+  contents: read
+  code-scanning: write
 
 jobs:
   upload:
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
+      # Step 2: Run Endor scan to generate SARIF
+      - name: Run Endor scan to generate SARIF
+        run: endorctl scan --sarif-file findings.sarif
+
+      # Step 3: Upload SARIF results to GitHub
       - name: Upload SARIF results to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
