@@ -45,7 +45,7 @@ jobs:
 
       # Step 4: Run Endor scan and generate SARIF
       - name: Run Endor scan
-        run: ./endorctl scan -n nryn.vak --sarif-file findings.sarif
+        run: ./endorctl scan -n nryn.vak --token $ENDOR_TOKEN --sarif-file findings.sarif
 
       # Step 5: Upload SARIF results to GitHub
       - name: Upload SARIF results to GitHub
