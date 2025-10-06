@@ -13,13 +13,21 @@ jobs:
     runs-on: macos-latest   # MacOS runner for ARM64
 
     steps:
-      # Step 1: Checkout the repository
+      # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           persist-credentials: true
 
-      # Step 2: Install Endor Labs CLI for MacOS ARM64
+      # Step 2: Debug Git (optional, remove after workflow works)
+      - name: Debug Git
+        run: |
+          echo "Current directory: $PWD"
+          git status
+          git branch
+          ls -la
+
+      # Step 3: Install Endor Labs CLI for MacOS ARM64
       - name: Install Endor Labs CLI
         run: |
           # Download latest CLI
@@ -34,11 +42,11 @@ jobs:
           # Make endorctl available in PATH
           export PATH="$PWD:$PATH"
 
-      # Step 3: Run Endor scan and generate SARIF
+      # Step 4: Run Endor scan and generate SARIF
       - name: Run Endor scan
         run: ./endorctl scan --sarif-file findings.sarif
 
-      # Step 4: Upload SARIF results to GitHub
+      # Step 5: Upload SARIF results to GitHub
       - name: Upload SARIF results to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
